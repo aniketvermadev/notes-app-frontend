@@ -56,7 +56,7 @@ const Users = () => {
                       <button
                         key={user._id}
                         onClick={() => setSelectedUser(user)}
-                        className={`w-full text-left flex items-center gap-3 p-3 rounded-lg transition-colors ${isSelected ? 'bg-teal-50' : 'hover:bg-gray-50'}`}
+                        className={`w-full text-left flex items-center gap-3 p-3 rounded-lg transition-colors ${isSelected ? 'bg-indigo-50' : 'hover:bg-gray-50'}`}
                       >
                         <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium text-gray-700">
                           {initials}

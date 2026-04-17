@@ -120,9 +120,9 @@ const Chat = ({ currentUserId, otherUserId }) => {
                   </div>
                 )}
 
-                <div className={`msg-enter max-w-[75%] px-3 py-2 rounded-2xl shadow-sm break-words ${isMine ? 'bg-teal-500 text-white self-end' : 'bg-gray-100 text-gray-900 self-start'}`}>
+                <div className={`msg-enter max-w-[75%] px-3 py-2 rounded-2xl shadow-sm break-words ${isMine ? 'bg-indigo-600 text-white self-end' : 'bg-gray-100 text-gray-900 self-start'}`}>
                   <div className="text-sm leading-5 whitespace-pre-wrap">{msg.text}</div>
-                  <div className="text-xs text-gray-500 mt-1">{senderName}{time ? ` · ${time}` : ''}</div>
+                  <div className={`${isMine ? 'text-indigo-100/90' : 'text-gray-500'} text-xs mt-1`}>{senderName}{time ? ` · ${time}` : ''}</div>
                 </div>
 
                 {isMine && (
@@ -190,7 +190,7 @@ const Chat = ({ currentUserId, otherUserId }) => {
           <button
             onClick={handleSend}
             disabled={!message.trim()}
-            className={`px-4 py-2 rounded-md text-white ${message.trim() ? 'bg-teal-500 hover:bg-teal-600' : 'bg-gray-400 cursor-not-allowed'}`}
+            className={`px-4 py-2 rounded-md text-white ${message.trim() ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-gray-400 cursor-not-allowed'}`}
           >
             Send
           </button>
