@@ -4,7 +4,7 @@ import socket from '../socket';
 import EmojiPicker from 'emoji-picker-react';
 import { MdOutlineEmojiEmotions } from "react-icons/md";
 
-const Chat = ({ currentUserId, otherUserId }) => {
+const Chat = ({ currentUserId, otherUserId, selectedUser }) => {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
@@ -12,6 +12,10 @@ const Chat = ({ currentUserId, otherUserId }) => {
   const [showEmoji, setShowEmoji] = useState(false);
   const pickerRef = useRef(null);
   const emojiButtonRef = useRef(null);
+  const [isOtherTyping, setIsOtherTyping] = useState(false);
+  const typingTimeoutRef = useRef(null);
+  const [isTyping, setIsTyping] = useState(false);
+  const [typingUser, setTypingUser] = useState(null);
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -55,6 +59,8 @@ const Chat = ({ currentUserId, otherUserId }) => {
     }
   }, [messages]);
 
+  // (removed duplicate typing listener)
+
   // close emoji picker on outside click or Escape
   useEffect(() => {
     const onDocClick = (e) => {
@@ -97,6 +103,36 @@ const Chat = ({ currentUserId, otherUserId }) => {
     }
   };
 
+  let typingTimeout;
+
+  const handleStopTyping = () => {
+    clearTimeout(typingTimeout);
+
+    typingTimeout = setTimeout(() => {
+      socket.emit('stop_typing', {
+        sender: currentUserId,
+        receiver: otherUserId,
+      });
+    }, 1000);
+  };
+
+  useEffect(() => {
+    socket.on('typing', (data) => {
+      setIsTyping(true);
+      setTypingUser(data.sender);
+    });
+
+    socket.on('stop_typing', () => {
+      setIsTyping(false);
+      setTypingUser(null);
+    });
+
+    return () => {
+      socket.off('typing');
+      socket.off('stop_typing');
+    };
+  }, []);
+
   return (
     <div className="w-full">
       <div className="flex justify-between items-center mb-3">
@@ -137,6 +173,21 @@ const Chat = ({ currentUserId, otherUserId }) => {
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Typing indicator */}
+        <div className="px-4 pb-2">
+          {isTyping && typingUser === otherUserId && (
+            <div className="inline-flex items-center gap-2 text-sm text-gray-600">
+              <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-xs font-medium text-gray-700">{selectedUser?.name ? selectedUser.name.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase() : 'U'}</div>
+              <div className="bg-gray-100 px-3 py-1 rounded-full">
+                <div className="typing-dots flex items-center gap-1">
+                  <span className="dot" />
+                  <span className="dot" />
+                  <span className="dot" />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
         <div className="border-t p-3 bg-gray-50 flex gap-2 items-end relative">
           <div className="flex items-end gap-2">
             <button
@@ -180,7 +231,19 @@ const Chat = ({ currentUserId, otherUserId }) => {
           <textarea
             ref={textareaRef}
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              setMessage(val);
+
+              // emit typing
+              socket.emit('typing', { sender: currentUserId, receiver: otherUserId });
+
+              // debounce stop typing
+              if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+              typingTimeoutRef.current = setTimeout(() => {
+                socket.emit('stop_typing', { sender: currentUserId, receiver: otherUserId });
+              }, 900);
+            }}
             onKeyDown={onKeyDown}
             placeholder="Type a message and press Enter to send (Shift+Enter for newline)"
             rows={1}

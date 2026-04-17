@@ -97,6 +97,7 @@ const Users = () => {
                     <Chat
                       currentUserId={currentUser._id}
                       otherUserId={selectedUser._id}
+                      selectedUser={selectedUser}
                     />
                   </div>
                 </div>
