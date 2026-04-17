@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import API from '../services/api';
 import socket from '../socket';
 import EmojiPicker from 'emoji-picker-react';
+import { MdOutlineEmojiEmotions } from "react-icons/md";
 
 const Chat = ({ currentUserId, otherUserId }) => {
   const [message, setMessage] = useState('');
@@ -102,14 +103,14 @@ const Chat = ({ currentUserId, otherUserId }) => {
         <h2 className="m-0 text-lg font-semibold">Chat</h2>
       </div>
 
-  <div className="bg-white rounded-lg shadow flex flex-col h-[60vh]" aria-live="polite">
-  <div className="p-4 overflow-y-auto overscroll-contain flex flex-col gap-3 flex-1 bg-gradient-to-b from-gray-50 to-white">
+      <div className="bg-white rounded-lg shadow flex flex-col h-[60vh]" aria-live="polite">
+        <div className="p-4 overflow-y-auto overscroll-contain flex flex-col gap-3 flex-1 bg-gradient-to-b from-gray-50 to-white">
           {messages.map((msg) => {
             const senderId = msg.sender?._id || msg.sender;
             const isMine = senderId === currentUserId;
             const senderName = isMine ? 'Me' : msg.sender?.name || 'User';
             const time = msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-            const initials = msg.sender?.name ? msg.sender.name.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase() : 'U';
+            const initials = msg.sender?.name ? msg.sender.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() : 'U';
 
             return (
               <div key={msg._id} className={`flex items-end ${isMine ? 'justify-end' : 'justify-start'}`}>
@@ -145,7 +146,7 @@ const Chat = ({ currentUserId, otherUserId }) => {
               onClick={() => setShowEmoji((s) => !s)}
               className="p-2 rounded-md hover:bg-gray-100"
             >
-              😊
+              <MdOutlineEmojiEmotions size={20} />
             </button>
 
             {showEmoji && (
